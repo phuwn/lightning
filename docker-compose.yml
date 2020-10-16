@@ -1,0 +1,11 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: admin
+      POSTGRES_DB: lightning
+    container_name: lightning_db
+    ports:
+      - 15432:5432
