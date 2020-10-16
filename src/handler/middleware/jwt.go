@@ -9,7 +9,7 @@ import (
 	"github.com/phuwn/lightning/src/model"
 )
 
-var noAuthPath = map[string]bool{"/healthz": true, "/auth": true}
+var authPath = map[string][]string{"/product": []string{"POST", "PUT", "DELETE"}}
 
 func authenticate(c echo.Context) error {
 	auth := c.Request().Header.Get("Authorization")
@@ -31,13 +31,18 @@ func authenticate(c echo.Context) error {
 // WithAuth - authentication middleware
 func WithAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if noAuthPath[c.Request().RequestURI] {
-			return next(c)
+		if methods, ok := authPath[c.Request().RequestURI]; ok {
+			for _, v := range methods {
+				if v == c.Request().Method {
+					err := authenticate(c)
+					if err != nil {
+						return errors.Customize(err, 401, "invalid token")
+					}
+					break
+				}
+			}
 		}
-		err := authenticate(c)
-		if err != nil {
-			return errors.Customize(err, 401, "invalid token")
-		}
+
 		return next(c)
 	}
 }
