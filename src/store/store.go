@@ -1,15 +1,20 @@
 package store
 
-import "github.com/phuwn/lightning/src/store/user"
+import (
+	"github.com/phuwn/lightning/src/store/product"
+	"github.com/phuwn/lightning/src/store/user"
+)
 
 // Store - server store struct
 type Store struct {
-	User user.Store
+	User    user.Store
+	Product product.Store
 }
 
 // New - create new store variable
 func New() *Store {
 	return &Store{
-		User: user.NewStore(),
+		User:    user.NewStore(),
+		Product: product.NewStore(),
 	}
 }

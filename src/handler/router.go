@@ -26,6 +26,7 @@ func Router() *echo.Echo {
 	r.GET("/healthz", healthz)
 	{
 		userRoutes(r)
+		productRoutes(r)
 	}
 
 	return r
