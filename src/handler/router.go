@@ -27,6 +27,7 @@ func Router() *echo.Echo {
 	{
 		userRoutes(r)
 		productRoutes(r)
+		paymentRoutes(r)
 	}
 
 	return r

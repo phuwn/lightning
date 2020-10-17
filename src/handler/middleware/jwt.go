@@ -9,7 +9,11 @@ import (
 	"github.com/phuwn/lightning/src/model"
 )
 
-var authPath = map[string][]string{"/product": []string{"POST", "PUT", "DELETE"}}
+var authPath = map[string][]string{
+	"user":    []string{"PUT"},
+	"product": []string{"POST", "PUT", "DELETE"},
+	"payment": []string{"GET", "POST", "DELETE"},
+}
 
 func authenticate(c echo.Context) error {
 	auth := c.Request().Header.Get("Authorization")
@@ -31,7 +35,11 @@ func authenticate(c echo.Context) error {
 // WithAuth - authentication middleware
 func WithAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if methods, ok := authPath[c.Request().RequestURI]; ok {
+		URIs := strings.Split(c.Request().RequestURI, "/")
+		if len(URIs) < 2 {
+			return errors.New("invalid path", 404)
+		}
+		if methods, ok := authPath[URIs[1]]; ok {
 			for _, v := range methods {
 				if v == c.Request().Method {
 					err := authenticate(c)
