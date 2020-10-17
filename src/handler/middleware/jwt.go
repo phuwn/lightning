@@ -9,13 +9,17 @@ import (
 	"github.com/phuwn/lightning/src/model"
 )
 
-var authPath = map[string][]string{
-	"user":    []string{"PUT"},
-	"product": []string{"POST", "PUT", "DELETE"},
-	"payment": []string{"GET", "POST", "DELETE"},
+var authPath = map[string]int{
+	"PUT-user":       1,
+	"POST-product":   2,
+	"PUT-product":    2,
+	"DELETE-product": 2,
+	"GET-payment":    1,
+	"POST-payment":   1,
+	"DELETE-payment": 1,
 }
 
-func authenticate(c echo.Context) error {
+func authenticate(c echo.Context, authorizeCode int) error {
 	auth := c.Request().Header.Get("Authorization")
 	if !strings.Contains(auth, "Bearer ") {
 		return errors.New("invalid auth method", 401)
@@ -24,11 +28,14 @@ func authenticate(c echo.Context) error {
 	if token == "" {
 		return errors.New("missing access_token", 401)
 	}
-	uid, err := model.VerifyUserSession(token)
+	tokenInfo, err := model.VerifyUserSession(token)
 	if err != nil {
 		return err
 	}
-	model.SetUserIDToCtx(c, uid)
+	if tokenInfo.Role < authorizeCode {
+		return errors.New("permission denied", 403)
+	}
+	model.SetUserIDToCtx(c, tokenInfo.UserID)
 	return nil
 }
 
@@ -39,15 +46,10 @@ func WithAuth(next echo.HandlerFunc) echo.HandlerFunc {
 		if len(URIs) < 2 {
 			return errors.New("invalid path", 404)
 		}
-		if methods, ok := authPath[URIs[1]]; ok {
-			for _, v := range methods {
-				if v == c.Request().Method {
-					err := authenticate(c)
-					if err != nil {
-						return errors.Customize(err, 401, "invalid token")
-					}
-					break
-				}
+		if role, ok := authPath[c.Request().Method+"-"+URIs[1]]; ok {
+			err := authenticate(c, role)
+			if err != nil {
+				return err
 			}
 		}
 
