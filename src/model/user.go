@@ -6,6 +6,11 @@ import (
 	"github.com/labstack/echo"
 )
 
+const (
+	MemberRole = iota + 1
+	AdminRole
+)
+
 // User data model
 type User struct {
 	Base
@@ -13,6 +18,7 @@ type User struct {
 	Name   string `json:"name"`
 	Email  string `json:"email"`
 	Avatar string `json:"avatar"`
+	Role   int    `json:"role"`
 
 	AccessToken *string `json:"access_token,omitempty" sql:"-"`
 }

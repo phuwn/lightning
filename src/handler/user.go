@@ -57,7 +57,7 @@ func signIn(c echo.Context) error {
 		return err
 	}
 
-	jwt, err := model.GenerateJWTToken(&model.TokenInfo{UserID: u.ID}, time.Now().Add(24*time.Hour).Unix())
+	jwt, err := model.GenerateJWTToken(&model.TokenInfo{UserID: u.ID, Role: u.Role}, time.Now().Add(24*time.Hour).Unix())
 	if err != nil {
 		return err
 	}

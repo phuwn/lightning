@@ -11,7 +11,8 @@ create table users (
 	deleted_at timestamp(6) with time zone,
 	name varchar(200),
 	email varchar(200),
-	avatar text
+	avatar text,
+	role integer
 );
 
 create table products (

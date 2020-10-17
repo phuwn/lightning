@@ -12,6 +12,7 @@ import (
 type TokenInfo struct {
 	jwt.StandardClaims
 	UserID string `json:"user_id"`
+	Role   int    `json:"role"`
 }
 
 var (
@@ -33,23 +34,23 @@ func GenerateJWTToken(info *TokenInfo, expiresAt int64) (string, error) {
 }
 
 // VerifyUserSession - validates user's access_token and returns user's id if it's verified
-func VerifyUserSession(tokenString string) (string, error) {
+func VerifyUserSession(tokenString string) (*TokenInfo, error) {
 	claims := TokenInfo{}
 	token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 
 	if !token.Valid {
-		return "", ErrInvalidToken
+		return nil, ErrInvalidToken
 	}
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return "", ErrInvalidSignature
+			return nil, ErrInvalidSignature
 		}
-		return "", ErrBadToken
+		return nil, ErrBadToken
 	}
 	if time.Unix(claims.ExpiresAt, 0).Before(time.Now()) {
-		return "", ErrInvalidToken
+		return nil, ErrInvalidToken
 	}
-	return claims.UserID, nil
+	return &claims, nil
 }
