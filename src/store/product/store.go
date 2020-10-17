@@ -6,7 +6,7 @@ import (
 	"github.com/phuwn/lightning/src/model"
 )
 
-// Store - user store interface
+// Store - product store interface
 type Store interface {
 	Get(c echo.Context, id int) (*model.Product, error)
 	GetAll(c echo.Context) ([]*model.Product, error)
