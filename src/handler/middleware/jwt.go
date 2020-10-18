@@ -10,6 +10,7 @@ import (
 )
 
 var authPath = map[string]int{
+	"GET-user":       1,
 	"PUT-user":       1,
 	"POST-product":   2,
 	"PUT-product":    2,
